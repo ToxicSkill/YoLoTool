@@ -74,7 +74,7 @@ namespace YoLoTool.Views
                 DecelerationRatio = 0.9,
                 Duration = new System.Windows.Duration(TimeSpan.FromSeconds(1)),
             };
-            grid.BeginAnimation(Grid.MarginProperty, da1);
+            grid.BeginAnimation(MarginProperty, da1);
         }
 
         private void MariginMouseLeavesAnimation(Grid grid, SymbolIcon symbolIcon)
@@ -88,7 +88,7 @@ namespace YoLoTool.Views
                 Duration = new System.Windows.Duration(TimeSpan.FromSeconds(1)),
 
             };
-            grid.BeginAnimation(Grid.MarginProperty, da2);
+            grid.BeginAnimation(MarginProperty, da2);
         }
     }
 }

@@ -53,6 +53,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="20"/>
                     <RowDefinition Height="20"/>
+                    <RowDefinition Height="40"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <StackPanel Orientation="Horizontal">
@@ -62,8 +63,10 @@
                 <StackPanel Grid.Row="1" Orientation="Horizontal">
                     <TextBlock Text="Y:  "/>
                     <TextBlock Text="{Binding YPosition, StringFormat=N0, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                </StackPanel> 
-                    <ListView Grid.Row="2" x:Name="imagesList" 
+                </StackPanel>
+                <TextBlock Grid.Row="2" Text="{Binding SelectedImage.SelectedObject, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                           HorizontalAlignment="Center" FontSize="32"/>
+                <ListView Grid.Row="3" x:Name="imagesList" 
                               ItemsSource="{Binding ImagesAttributeContainer.Images, Mode=OneWay}"
                                 SelectedItem="{Binding SelectedImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               SelectionChanged="imagesList_SelectionChanged"

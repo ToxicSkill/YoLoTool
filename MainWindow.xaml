@@ -14,6 +14,7 @@
     xmlns:viewmodels="clr-namespace:YoLoTool.ViewModels" 
     d:DataContext="{d:DesignInstance Type=viewmodels:MainWindowViewModel}"
     Background="{ui:ThemeResource ApplicationBackgroundBrush}" 
+    WindowState="Maximized"
     WindowStartupLocation="CenterScreen">
 
     <Grid>

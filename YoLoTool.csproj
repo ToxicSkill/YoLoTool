@@ -16,6 +16,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="AI\Yolo\yolov7-tiny.onnx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="AI\Yolo\yolov7-tiny.onnx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
@@ -28,10 +38,6 @@
     <PackageReference Include="OpenCvSharp4.Windows" Version="4.8.0.20230708" />
     <PackageReference Include="OpenCvSharp4.WpfExtensions" Version="4.8.0.20230708" />
     <PackageReference Include="WPF-UI" Version="2.1.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="AI\Yolo\" />
   </ItemGroup>
 
 </Project>

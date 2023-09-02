@@ -71,6 +71,10 @@ namespace YoLoTool.ViewModels
             _imagesAttributeContainer = imagesAttributeContainer;
             _imagesPaths = new ();
             _allowedLabelNames = new();
+#if DEBUG
+            _yolo.LoadYoloModel("C: \\Users\\Adam Poler\\Desktop\\WŁASNE_PROGRAMY\\YoLoTool\\AI\\Yolo\\yolov7 - tiny.onnx");
+            Stage1Completed = true;
+#endif
         }
 
         [RelayCommand]
@@ -78,26 +82,18 @@ namespace YoLoTool.ViewModels
         {
             var path = _loaderService.GetSingleFolderPath();
             var filters = new String[] { "jpg", "jpeg", "png", "gif", "tiff", "bmp", "svg" };
-            var files = GetFilesFrom(path, filters, false).ToList();
+            var files = Helpers.IOHelper.GetFilesFrom(path, filters, false).ToList();
             if (files.Any())
             {
                 _imagesPaths = files;
                 Stage2Completed = true;
-                DataPath = System.IO.Path.GetFileName(path);
-                TotalDataCount = files.Count();
+                DataPath = Path.GetFileName(path);
+                TotalDataCount = files.Count;
                 _snackbarService.Show("Success", "Data was successfully loaded", Wpf.Ui.Common.SymbolRegular.CheckmarkCircle20, Wpf.Ui.Common.ControlAppearance.Success);
             }
         }
-        public static String[] GetFilesFrom(String searchFolder, String[] filters, bool isRecursive)
-        {
-            var filesFound = new List<String>();
-            var searchOption = isRecursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
-            foreach (var filter in filters)
-            {
-                filesFound.AddRange(Directory.GetFiles(searchFolder, String.Format("*.{0}", filter), searchOption));
-            }
-            return filesFound.ToArray();
-        }
+
+        
 
         [RelayCommand]
         private void LoadModel()
@@ -105,7 +101,7 @@ namespace YoLoTool.ViewModels
             var path = _loaderService.GetSingleFilePath(OnnxModelExtension);
             if (_yolo.LoadYoloModel(path))
             {
-                ModelPath = System.IO.Path.GetFileName(path);
+                ModelPath = Path.GetFileName(path);
                 _snackbarService.Show("Success", "Yolo model was successfully loaded", Wpf.Ui.Common.SymbolRegular.CheckmarkCircle20, Wpf.Ui.Common.ControlAppearance.Success);
                 Stage1Completed = true;
             }
@@ -156,7 +152,7 @@ namespace YoLoTool.ViewModels
                     }
                 });
                 counter++;
-                await App.Current.Dispatcher.BeginInvoke(() =>
+                await System.Windows.Application.Current.Dispatcher.BeginInvoke(() =>
                 { 
                     ProcessedDataCount = counter;
                 });

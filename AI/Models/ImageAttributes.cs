@@ -8,6 +8,8 @@ namespace YoLoTool.AI.Models
 {
     public partial class ImageAttributes : ObservableObject
     {
+        private Rect _selecedRect;
+
         public Mat Mat { get; set; }
 
         [ObservableProperty]
@@ -17,7 +19,27 @@ namespace YoLoTool.AI.Models
 
         public List<Point> Points { get; set; }
 
-        public Rect SelectedRect { get; set; }
+        public Rect SelectedRect 
+        {
+            get => _selecedRect;
+            set 
+            {  
+                _selecedRect = value;
+                if (ObjectByRect.ContainsKey(value))
+                {
+                    SelectedObject = ObjectByRect[value];
+                }
+                else
+                {
+                    SelectedObject = "";
+                }
+            }
+        }
+
+        [ObservableProperty]
+        public string selectedObject;
+
+        public Dictionary<Rect, string> ObjectByRect{ get; set; }
 
         [ObservableProperty]
         public bool done;
@@ -25,6 +47,7 @@ namespace YoLoTool.AI.Models
         public ImageAttributes()
         {
             Mat = new();
+            ObjectByRect = new() { { new Rect(), "" } };
             Rects = new List<Rect>();
             Points = new List<Point>();
         }

@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using OpenCvSharp;
 using OpenCvSharp.WpfExtensions;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Data;
 using Wpf.Ui.Common.Interfaces;
@@ -41,17 +42,28 @@ namespace YoLoTool.ViewModels
             Draw(point2d, SelectedImage);
         }
 
-        public void Draw(Point2d point2d, ImageAttributes image)
+        public static void Draw(Point2d point2d, ImageAttributes image)
         {
             using var drawMat = image.Mat.Clone();
+            var rectsInRoi = new List<Rect>();
             foreach (var rect in image.Rects)
             {
                 drawMat.DrawRect(rect);
                 if (rect.Contains((int)point2d.X, (int)point2d.Y))
                 {
-                    drawMat.DrawRectInside(rect);
-                    image.SelectedRect = rect;
+                    rectsInRoi.Add(rect);
                 }
+            }
+            
+            if (rectsInRoi.Any())
+            {
+                var newSelectedRect = rectsInRoi.MinBy(x => (x.Width * x.Height));
+                drawMat.DrawRectInside(newSelectedRect);
+                image.SelectedRect = newSelectedRect; 
+            }
+            else
+            {
+                image.SelectedRect = new();
             }
 
             foreach (var point in image.Points)

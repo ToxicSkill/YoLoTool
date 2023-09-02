@@ -72,7 +72,7 @@ namespace YoLoTool.ViewModels
             _imagesPaths = new ();
             _allowedLabelNames = new();
 #if DEBUG
-            _yolo.LoadYoloModel("C: \\Users\\Adam Poler\\Desktop\\WŁASNE_PROGRAMY\\YoLoTool\\AI\\Yolo\\yolov7 - tiny.onnx");
+            _yolo.LoadYoloModel("AI\\Yolo\\yolov7-tiny.onnx");
             Stage1Completed = true;
 #endif
         }
@@ -91,9 +91,7 @@ namespace YoLoTool.ViewModels
                 TotalDataCount = files.Count;
                 _snackbarService.Show("Success", "Data was successfully loaded", Wpf.Ui.Common.SymbolRegular.CheckmarkCircle20, Wpf.Ui.Common.ControlAppearance.Success);
             }
-        }
-
-        
+        }        
 
         [RelayCommand]
         private void LoadModel()
@@ -108,7 +106,7 @@ namespace YoLoTool.ViewModels
         }
 
         [RelayCommand]
-        private async void RunPrelabel()
+        private async Task RunPrelabel()
         {
             var counter = 0;
             var prelabeledCounter = 0;
@@ -136,11 +134,13 @@ namespace YoLoTool.ViewModels
                                     (int)rectangle.Y,
                                     (int)rectangle.Width, 
                                     (int)rectangle.Height));
-                            image.Rects.Add(new OpenCvSharp.Rect(
+                            var imageRect = new OpenCvSharp.Rect(
                                 (int)rect.X,
                                 (int)rect.Y,
                                 (int)rect.Width,
-                                (int)rect.Height));
+                                (int)rect.Height);
+                            image.Rects.Add(imageRect);
+                            image.ObjectByRect.Add(imageRect, detection.Label.Name);
                             image.Points.Add(new OpenCvSharp.Point(rect.X, rect.Y));
                             image.Points.Add(new OpenCvSharp.Point(rect.X + rect.Width, rect.Y + rect.Height));
                             successFlag = true;

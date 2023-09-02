@@ -6,6 +6,8 @@ namespace YoLoTool.AI.Interfaces
 {
     public interface IYolo
     {
+        List<YoloLabel> GetModelLabels();
+
         Rect CastToOriginalSize(OpenCvSharp.Size size, Rect detectionRect, bool roi = true);
 
         public bool LoadYoloModel(string path);

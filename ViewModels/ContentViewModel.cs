@@ -33,8 +33,7 @@ namespace YoLoTool.ViewModels
             if (ImagesAttributeContainer.Images.Any())
             {
                 SelectedImage = ImagesAttributeContainer.Images.First();
-            }
-            BindingOperations.EnableCollectionSynchronization(ImagesAttributeContainer.Images, this);
+            } 
         }
 
         public void DrawImage(Point2d point2d)
@@ -146,6 +145,10 @@ namespace YoLoTool.ViewModels
 
         public void OnNavigatedTo()
         {
+            if (SelectedImage == null && ImagesAttributeContainer.Images.Any())
+            {
+                SelectedImage = ImagesAttributeContainer.Images.First();
+            }
             foreach (var image in ImagesAttributeContainer.Images)
             {
                 Draw(new Point2d(), image);

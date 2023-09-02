@@ -4,135 +4,182 @@
             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-           xmlns:viewmodels="clr-namespace:YoLoTool.ViewModels" 
+            xmlns:viewmodels="clr-namespace:YoLoTool.ViewModels" 
+            xmlns:labels="clr-namespace:YoLoTool.AI.Models"
              xmlns:c="clr-namespace:YoLoTool.Converters" 
            d:DataContext="{d:DesignInstance Type=viewmodels:HomeViewModel}"
             Title="Dashboard"
             mc:Ignorable="d" 
-            d:DesignHeight="450" d:DesignWidth="800">
+            d:DesignHeight="1080" d:DesignWidth="1920">
     <ui:UiPage.Resources>
         <ResourceDictionary>
             <c:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+            <c:ERunModeToVisibility x:Key="ERunModeToVisibility"/>
+            <c:ERunModeToVisibilityInversion x:Key="ERunModeToVisibilityInversion"/>
+            <c:ERunModeToVisibilitySpecific x:Key="ERunModeToVisibilitySpecific"/>
+            <c:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
         </ResourceDictionary>
     </ui:UiPage.Resources>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Separator Grid.Column="1"/>
-        <Separator Grid.Column="2"/>
-        <Grid x:Name="stage1"
+        <ui:Button HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="30" Margin="10" 
+                   Icon="ArrowLeft20" Content="Back" VerticalContentAlignment="Center"
+                   Command="{Binding BackCommand}"
+                   Visibility="{Binding RunMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ERunModeToVisibilityInversion}}"/>
+        <Grid Visibility="{Binding RunMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ERunModeToVisibilityInversion}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Separator Grid.Column="1"/>
+            <Separator Grid.Column="2"/>
+            <Grid x:Name="stage1"
               MouseEnter="Grid_MouseEnterStage1" 
-              MouseLeave="Grid_MouseLeaveStage1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="220"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <StackPanel Margin="0,50,0,0">
-                <ui:SymbolIcon x:Name="symbolStage1" Symbol="Cube20" FontSize="42"/>
-                <TextBlock HorizontalAlignment="Center"
+              MouseLeave="Grid_MouseLeaveStage1"
+                  Visibility="{Binding RunMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ERunModeToVisibilitySpecific}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="220"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <StackPanel Margin="0,50,0,0">
+                    <ui:SymbolIcon x:Name="symbolStage1" Symbol="Cube20" FontSize="42"/>
+                    <TextBlock HorizontalAlignment="Center"
                        VerticalAlignment="Stretch" 
                        Text="Load Model" FontWeight="Thin" FontSize="42"/>
-            </StackPanel>
-            <Rectangle Grid.Row="1" Fill="Transparent"/>
-            <Rectangle Grid.Row="2" Fill="Transparent"/>
-            <Grid Grid.Row="1" >
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <ui:Button HorizontalAlignment="Center" MinWidth="120" MinHeight="30"
+                </StackPanel>
+                <Rectangle Grid.Row="1" Fill="Transparent"/>
+                <Rectangle Grid.Row="2" Fill="Transparent"/>
+                <Grid Grid.Row="1" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <ui:Button HorizontalAlignment="Center" MinWidth="120" MinHeight="30"
                        Content="Load model" Command="{Binding LoadModelCommand}" />
-                <StatusBarItem Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top">
-                    <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" 
+                    <StatusBarItem Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top">
+                        <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" 
                                Text="{Binding ModelPath, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-                </StatusBarItem>
-            </Grid>
-            <ui:SymbolIcon Grid.Row="2" Symbol="CheckmarkCircle20" Foreground="LawnGreen" FontSize="85"
+                    </StatusBarItem>
+                </Grid>
+                <ui:SymbolIcon Grid.Row="2" Symbol="CheckmarkCircle20" Foreground="LawnGreen" FontSize="85"
                            Visibility="{Binding Stage1Completed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
-        </Grid>
-        <Grid Grid.Column="1"  x:Name="stage2"
+            </Grid>
+            <Grid Grid.Column="1"  x:Name="stage2"
               MouseEnter="Grid_MouseEnterStage1" 
               MouseLeave="Grid_MouseLeaveStage1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="220"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <StackPanel Margin="0,50,0,0">
-                <ui:SymbolIcon x:Name="symbolStage2" Symbol="ClipboardDataBar20" FontSize="42"/>
-                <TextBlock HorizontalAlignment="Center"
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="220"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <StackPanel Margin="0,50,0,0">
+                    <ui:SymbolIcon x:Name="symbolStage2" Symbol="ClipboardDataBar20" FontSize="42"/>
+                    <TextBlock HorizontalAlignment="Center"
                        VerticalAlignment="Stretch" 
                        Text="Load Data" FontWeight="Thin" FontSize="42"/>
-            </StackPanel>
-            <Rectangle Grid.Row="1" Fill="Transparent"/>
-            <Rectangle Grid.Row="2" Fill="Transparent"/>
-            <Grid Grid.Row="1" >
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <ui:Button HorizontalAlignment="Center" MinWidth="120" MinHeight="30"
+                </StackPanel>
+                <Rectangle Grid.Row="1" Fill="Transparent"/>
+                <Rectangle Grid.Row="2" Fill="Transparent"/>
+                <Grid Grid.Row="1" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="100"/>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="100"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <ui:Button HorizontalAlignment="Center" MinWidth="120" MinHeight="30"
                            IsEnabled="{Binding Stage1Completed, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                        Content="Load data" Command="{Binding LoadDataCommand}"/>
-                <StatusBarItem Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top">
-                    <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" 
+                    <StatusBarItem Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top">
+                        <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" 
                                Text="{Binding DataPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                </StatusBarItem>
-                <StackPanel Grid.Row="2" HorizontalAlignment="Center" Orientation="Horizontal">
-                    <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" 
+                    </StatusBarItem>
+                    <StackPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Top" Orientation="Horizontal">
+                        <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" 
                                Text="Count:  " />
-                    <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" 
+                        <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" 
                                Text="{Binding TotalDataCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                </StackPanel>
-            </Grid>
-            <ui:SymbolIcon Grid.Row="2" Symbol="CheckmarkCircle20" Foreground="LawnGreen" FontSize="85"
+                    </StackPanel>
+                    <ui:Button Grid.Row="3" HorizontalAlignment="Center" Icon="Add20" Content="Add label"/>
+                    <ui:VirtualizingItemsControl Grid.Row="2"
+                            ItemsSource="{Binding ImagesAttributeContainer.Labels}"
+                            VirtualizingPanel.CacheLengthUnit="Pixel">
+
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="labels:YoloLabel">
+                                <Grid>
+                                    <ui:Button CornerRadius="2" BorderBrush="{Binding Color, Converter={StaticResource ColorToBrushConverter}}"/>
+                                    <TextBlock Text="{Binding Id}"/>
+                                    <TextBlock Text="{Binding Name}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ui:VirtualizingItemsControl>
+                </Grid>
+                <ui:SymbolIcon Grid.Row="2" Symbol="CheckmarkCircle20" Foreground="LawnGreen" FontSize="85"
                            Visibility="{Binding Stage2Completed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"/>
-        </Grid>
-        <Grid Grid.Column="2" x:Name="stage3"
+            </Grid>
+            <Grid Grid.Column="2" x:Name="stage3"
               MouseEnter="Grid_MouseEnterStage1" 
-              MouseLeave="Grid_MouseLeaveStage1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="220"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <StackPanel Margin="0,50,0,0">
-                <ui:SymbolIcon x:Name="symbolStage3" Symbol="Fire20" FontSize="42"/>
-                <TextBlock HorizontalAlignment="Center"
-                       VerticalAlignment="Stretch" 
-                       Text="Adjust &amp; Run" FontWeight="Thin" FontSize="42"/>
-            </StackPanel>
-            <Rectangle Grid.Row="1" Fill="Transparent"/>
-            <Rectangle Grid.Row="2" Fill="Transparent"/>
-            <Grid Grid.Row="1" >
+              MouseLeave="Grid_MouseLeaveStage1"
+                  Visibility="{Binding RunMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ERunModeToVisibilitySpecific}}">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="220"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <ui:Button HorizontalAlignment="Center" MinWidth="120" MinHeight="30"
-                      IsEnabled="{Binding Stage2Completed, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                       Content="Run prelabeling" Command="{Binding RunPrelabelCommand}" /> 
-                <StackPanel Grid.Row="2" HorizontalAlignment="Center" Orientation="Horizontal">
-                    <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" 
-                               Text="{Binding ProcessedDataCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" 
-                               Text=" / " />
-                    <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" 
-                               Text="{Binding TotalDataCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <StackPanel Margin="0,50,0,0">
+                    <ui:SymbolIcon x:Name="symbolStage3" Symbol="Fire20" FontSize="42"/>
+                    <TextBlock HorizontalAlignment="Center"
+                       VerticalAlignment="Stretch" 
+                       Text="Adjust &amp; Run" FontWeight="Thin" FontSize="42"/>
                 </StackPanel>
-            </Grid>
-            <ui:SymbolIcon Grid.Row="2" Symbol="CheckmarkCircle20" Foreground="LawnGreen" FontSize="85"
+                <Rectangle Grid.Row="1" Fill="Transparent"/>
+                <Rectangle Grid.Row="2" Fill="Transparent"/>
+                <Grid Grid.Row="1" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <ui:Button HorizontalAlignment="Center" MinWidth="120" MinHeight="30"
+                      IsEnabled="{Binding Stage2Completed, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                       Content="Run prelabeling" Command="{Binding RunPrelabelCommand}" />
+                    <StackPanel Grid.Row="2" HorizontalAlignment="Center" Orientation="Horizontal">
+                        <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" 
+                               Text="{Binding ProcessedDataCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" 
+                               Text=" / " />
+                        <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" 
+                               Text="{Binding TotalDataCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+                </Grid>
+                <ui:SymbolIcon Grid.Row="2" Symbol="CheckmarkCircle20" Foreground="LawnGreen" FontSize="85"
                            Visibility="{Binding Stage3Completed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"/>
-            <ui:ProgressRing Grid.Row="2" Foreground="LawnGreen" IsIndeterminate="True" Visibility="{Binding IsSpinnerVisible, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"  IsEnabled="True"/>
+                <ui:ProgressRing Grid.Row="2" Foreground="LawnGreen" IsIndeterminate="True" Visibility="{Binding IsSpinnerVisible, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"  IsEnabled="True"/>
+            </Grid>
+        </Grid>
+
+        <Grid Visibility="{Binding RunMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ERunModeToVisibility}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <ui:Button VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                       CornerRadius="60" FontSize="64" FontWeight="Thin"
+                       Icon="Predictions20"
+                       Content="PRE Labeling" Margin="100, 200"
+                       Command="{Binding PrelabelingCommand}"/>
+            <ui:Button Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                       CornerRadius="60" FontSize="64" FontWeight="Thin"
+                       Icon="CopySelect20"
+                       Content="Labeling" Margin="100, 200"
+                       Command="{Binding LabelingCommand}"/>
         </Grid>
     </Grid>
+   
 
 </ui:UiPage>

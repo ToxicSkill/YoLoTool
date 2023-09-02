@@ -27,6 +27,11 @@ namespace YoLoTool.AI.Models
             _yoloDecorator = new YoloDecorator();
         }
 
+        public List<YoloLabel> GetModelLabels()
+        {
+            return _model.Labels;
+        }
+
         public bool LoadYoloModel(string path)
         {
             try

@@ -53,7 +53,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="20"/>
                     <RowDefinition Height="20"/>
-                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="60"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <StackPanel Orientation="Horizontal">
@@ -67,7 +67,7 @@
                 <TextBlock Grid.Row="2" Text="{Binding SelectedImage.SelectedObject, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                            HorizontalAlignment="Center" FontSize="32"/>
                 <ListView Grid.Row="3" x:Name="imagesList" 
-                              ItemsSource="{Binding ImagesAttributeContainer.Images, Mode=OneWay}"
+                              ItemsSource="{Binding ImagesAttributeContainer.Images, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 SelectedItem="{Binding SelectedImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               SelectionChanged="imagesList_SelectionChanged"
                                 ScrollViewer.PanningDeceleration="1"

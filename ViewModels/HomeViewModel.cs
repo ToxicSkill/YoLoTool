@@ -5,9 +5,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Wpf.Ui.Common.Interfaces;
 using Wpf.Ui.Mvvm.Contracts;
 using YoLoTool.AI.Interfaces;
 using YoLoTool.AI.Models;
+using YoLoTool.Enums;
 using YoLoTool.Models;
 using YoLoTool.Services;
 using YoLoTool.Views;
@@ -26,13 +28,14 @@ namespace YoLoTool.ViewModels
 
         private readonly INavigationService _navigationService;
 
-        private readonly ImagesAttributeContainer _imagesAttributeContainer;
-
         private readonly IYolo _yolo;
 
         private List<string> _imagesPaths;
 
         private readonly List<string> _allowedLabelNames;
+
+        [ObservableProperty]
+        private ImagesAttributeContainer imagesAttributeContainer;
 
         [ObservableProperty]
         public string dataPath;
@@ -45,6 +48,9 @@ namespace YoLoTool.ViewModels
 
         [ObservableProperty]
         public int processedDataCount;
+
+        [ObservableProperty]
+        public ERunMode runMode;
 
         [ObservableProperty]
         public bool stage1Completed;
@@ -68,7 +74,7 @@ namespace YoLoTool.ViewModels
             _loaderService = loaderService;
             _yolo = yolo;
             _snackbarService = snackbarService;
-            _imagesAttributeContainer = imagesAttributeContainer;
+            this.imagesAttributeContainer = imagesAttributeContainer;
             _imagesPaths = new ();
             _allowedLabelNames = new();
 #if DEBUG
@@ -77,8 +83,13 @@ namespace YoLoTool.ViewModels
 #endif
         }
 
+        partial void OnRunModeChanged(ERunMode value)
+        {
+            Stage1Completed = value == ERunMode.Labeling;
+        }
+
         [RelayCommand]
-        private void LoadData()
+        private async Task LoadData()
         {
             var path = _loaderService.GetSingleFolderPath();
             var filters = new String[] { "jpg", "jpeg", "png", "gif", "tiff", "bmp", "svg" };
@@ -90,8 +101,22 @@ namespace YoLoTool.ViewModels
                 DataPath = Path.GetFileName(path);
                 TotalDataCount = files.Count;
                 _snackbarService.Show("Success", "Data was successfully loaded", Wpf.Ui.Common.SymbolRegular.CheckmarkCircle20, Wpf.Ui.Common.ControlAppearance.Success);
+                if (RunMode == ERunMode.Labeling)
+                {
+                    foreach (var imagePath in _imagesPaths)
+                    {
+                        var image = new ImageAttributes();
+                        image.LoadImage(imagePath);
+                        lock (imagesAttributeContainer.Locker)
+                        {
+                            imagesAttributeContainer.Images.Add(image);
+                        }
+                    }
+                    await Task.Delay(DelayAfterAllStages);
+                    _navigationService.Navigate(typeof(ContentView));
+                }
             }
-        }        
+        }
 
         [RelayCommand]
         private void LoadModel()
@@ -100,6 +125,7 @@ namespace YoLoTool.ViewModels
             if (_yolo.LoadYoloModel(path))
             {
                 ModelPath = Path.GetFileName(path);
+                ImagesAttributeContainer.Labels = new(_yolo.GetModelLabels());
                 _snackbarService.Show("Success", "Yolo model was successfully loaded", Wpf.Ui.Common.SymbolRegular.CheckmarkCircle20, Wpf.Ui.Common.ControlAppearance.Success);
                 Stage1Completed = true;
             }
@@ -156,7 +182,10 @@ namespace YoLoTool.ViewModels
                 { 
                     ProcessedDataCount = counter;
                 });
-                _imagesAttributeContainer.Images.Add(image);
+                lock (imagesAttributeContainer.Locker)
+                {
+                    imagesAttributeContainer.Images.Add(image);
+                }
             }
             IsSpinnerVisible = false;
             Stage3Completed = true;
@@ -164,5 +193,23 @@ namespace YoLoTool.ViewModels
             await Task.Delay(DelayAfterAllStages);
             _navigationService.Navigate(typeof(ContentView));
         }
+
+        [RelayCommand]
+        private void Prelabeling()
+        {
+            RunMode = ERunMode.Prelabeling;
+        }
+
+        [RelayCommand]
+        private void Labeling()
+        {
+            RunMode = ERunMode.Labeling;
+        }
+
+        [RelayCommand]
+        private void Back()
+        {
+            RunMode = ERunMode.SelectingMode;
+        } 
     }
 }

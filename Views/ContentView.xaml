@@ -51,20 +51,38 @@
         <Grid Grid.Column="1">
             <Grid ScrollViewer.CanContentScroll="True">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="20"/>
-                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="50"/>
                     <RowDefinition Height="60"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="X:  "/>
-                    <TextBlock Text="{Binding XPosition, StringFormat=N0, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                </StackPanel>
-                <StackPanel Grid.Row="1" Orientation="Horizontal">
-                    <TextBlock Text="Y:  "/>
-                    <TextBlock Text="{Binding YPosition, StringFormat=N0, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                </StackPanel>
-                <TextBlock Grid.Row="2" Text="{Binding SelectedImage.SelectedObject, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                <Grid Margin="5">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="X:  "/>
+                            <TextBlock Text="{Binding XPosition, StringFormat=N0, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" Orientation="Horizontal">
+                            <TextBlock Text="Y:  "/>
+                            <TextBlock Text="{Binding YPosition, StringFormat=N0, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+                    </Grid>
+                    <ComboBox ItemsSource="{Binding ImagesAttributeContainer.Labels}"
+                              DisplayMemberPath="Name"
+                              SelectedValue="{Binding SelectedLabel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              Margin="50,0,0,0"/>
+                </Grid>
+                
+                <TextBlock Grid.Row="1" Text="{Binding SelectedImage.SelectedObject, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                            HorizontalAlignment="Center" FontSize="32"/>
                 <ListView Grid.Row="3" x:Name="imagesList" 
                               ItemsSource="{Binding ImagesAttributeContainer.Images, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"

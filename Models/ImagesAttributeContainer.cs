@@ -19,6 +19,7 @@ namespace YoLoTool.Models
         {
             Images = new ();
             Locker = new object();
+            Labels = new ();
             BindingOperations.EnableCollectionSynchronization(Images, Locker);
         }
     }

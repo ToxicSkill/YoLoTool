@@ -3,23 +3,13 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
 using YoLoTool.AI.Models;
+using YoLoTool.Extensions;
 
 namespace YoLoTool.AI
 {
     public class YoloDecorator
-    {
-        private readonly MD5 _md5;
-
-        private readonly Dictionary<string, Color> _labelColorByName;
-
-        public YoloDecorator()
-        {
-            _md5 = MD5.Create();
-            _labelColorByName = new();
-        }
-
+    {  
         public void DecorateModelInformations(YoloModel yoloModel, InferenceSession inferenceSession)
         {
             SetupYoloDefaultLabels(yoloModel);
@@ -31,18 +21,8 @@ namespace YoLoTool.AI
         {
             labels.Select((s, i) => new { i, s }).ToList().ForEach(item =>
             {
-                yoloModel.Labels.Add(new YoloLabel() { Id = item.i, Name = item.s, Color = GetLabelColor(item.s) });
+                yoloModel.Labels.Add(new YoloLabel() { Id = item.i, Name = item.s, Color = item.s.GetLabelColor() });
             });
-        }
-
-        private Color GetLabelColor(string name)
-        {
-            if (_labelColorByName.ContainsKey(name.ToLowerInvariant()))
-            {
-                return _labelColorByName[name];
-            }
-            var hash = _md5.ComputeHash(Encoding.UTF8.GetBytes(name));
-            return Color.FromArgb(hash[2], hash[0], hash[1]);
         }
 
         private void SetupYoloDefaultLabels(YoloModel yoloModel)

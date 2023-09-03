@@ -5,11 +5,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Wpf.Ui.Common.Interfaces;
 using Wpf.Ui.Mvvm.Contracts;
 using YoLoTool.AI.Interfaces;
 using YoLoTool.AI.Models;
 using YoLoTool.Enums;
+using YoLoTool.Extensions;
 using YoLoTool.Models;
 using YoLoTool.Services;
 using YoLoTool.Views;
@@ -44,6 +44,12 @@ namespace YoLoTool.ViewModels
         public string modelPath;
 
         [ObservableProperty]
+        public string newLabelText = "";
+
+        [ObservableProperty]
+        public int removeLabelIndex;
+
+        [ObservableProperty]
         public int totalDataCount;
 
         [ObservableProperty]
@@ -76,7 +82,7 @@ namespace YoLoTool.ViewModels
             _snackbarService = snackbarService;
             this.imagesAttributeContainer = imagesAttributeContainer;
             _imagesPaths = new ();
-            _allowedLabelNames = new();
+            _allowedLabelNames = new(); 
 #if DEBUG
             _yolo.LoadYoloModel("AI\\Yolo\\yolov7-tiny.onnx");
             Stage1Completed = true;
@@ -192,6 +198,44 @@ namespace YoLoTool.ViewModels
             _snackbarService.Show("Success", $"Successfully prelabeled {prelabeledCounter} images.", Wpf.Ui.Common.SymbolRegular.CheckmarkCircle20, Wpf.Ui.Common.ControlAppearance.Success);
             await Task.Delay(DelayAfterAllStages);
             _navigationService.Navigate(typeof(ContentView));
+        }
+
+        [RelayCommand]
+        private void AddLabel()
+        {
+            if (string.IsNullOrEmpty(NewLabelText) || NewLabelText.Count() < 3)
+            {
+                _snackbarService.Show("Fail", "New label should have at least 3 signs.", Wpf.Ui.Common.SymbolRegular.Warning20, Wpf.Ui.Common.ControlAppearance.Danger);
+                return;
+            }
+            ImagesAttributeContainer.Labels.Add(new YoloLabel()
+            {
+                Id = ImagesAttributeContainer.Labels.Count,
+                Name = NewLabelText,
+                Color = NewLabelText.GetLabelColor()
+            }); 
+            _snackbarService.Show("Success", $"Successfully added new label: Name: {NewLabelText} ID: {ImagesAttributeContainer.Labels.Count-1}.", Wpf.Ui.Common.SymbolRegular.CheckmarkCircle20, Wpf.Ui.Common.ControlAppearance.Success);
+            NewLabelText = "";
+        }
+
+        [RelayCommand]
+        private void RemoveLabel()
+        {
+            if (!ImagesAttributeContainer.Labels.Any())
+            {
+                _snackbarService.Show("Fail", "There is no labels, nothing to remove.", Wpf.Ui.Common.SymbolRegular.Warning20, Wpf.Ui.Common.ControlAppearance.Danger);
+                return;
+            }
+            var itemToRemove = ImagesAttributeContainer.Labels.FirstOrDefault(x => x.Id == RemoveLabelIndex);
+            if (itemToRemove == null)
+            {
+                _snackbarService.Show("Fail", $"Label with given ID ({RemoveLabelIndex}) was not found.", Wpf.Ui.Common.SymbolRegular.Warning20, Wpf.Ui.Common.ControlAppearance.Danger);
+                return;
+            }
+            ImagesAttributeContainer.Labels.Remove(itemToRemove); 
+            _snackbarService.Show("Success", $"Successfully removed label: Name: {itemToRemove.Name} ID: {itemToRemove.Id}.", Wpf.Ui.Common.SymbolRegular.CheckmarkCircle20, Wpf.Ui.Common.ControlAppearance.Success);
+
+            RemoveLabelIndex = 0;
         }
 
         [RelayCommand]

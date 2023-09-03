@@ -5,7 +5,6 @@ using OpenCvSharp.WpfExtensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Data;
 using Wpf.Ui.Common.Interfaces;
 using YoLoTool.AI.Models;
 using YoLoTool.Drawers;
@@ -20,6 +19,9 @@ namespace YoLoTool.ViewModels
 
         [ObservableProperty]
         public ImageAttributes selectedImage;
+
+        [ObservableProperty]
+        public YoloLabel selectedLabel;
 
         [ObservableProperty]
         public double xPosition;
@@ -80,12 +82,16 @@ namespace YoLoTool.ViewModels
             if (SelectedImage.Points.Count % 2 == 0)
             {
                 var points = SelectedImage.Points.TakeLast(2).ToList();
-                SelectedImage.Rects.Add(
-                    new Rect(
+                var rect = new Rect(
                         points[0].X,
                         points[0].Y,
                         Math.Abs(points[1].X - points[0].X),
-                        Math.Abs(points[1].Y - points[0].Y)));
+                        Math.Abs(points[1].Y - points[0].Y));
+                if (SelectedLabel != null)
+                {
+                    SelectedImage.ObjectByRect.Add(rect, SelectedLabel.Name);
+                }
+                SelectedImage.Rects.Add(rect);
             }
         }
 
@@ -145,6 +151,10 @@ namespace YoLoTool.ViewModels
 
         public void OnNavigatedTo()
         {
+            if (ImagesAttributeContainer.Labels.Any())
+            {
+                SelectedLabel = ImagesAttributeContainer.Labels.First();
+            }
             if (SelectedImage == null && ImagesAttributeContainer.Images.Any())
             {
                 SelectedImage = ImagesAttributeContainer.Images.First();

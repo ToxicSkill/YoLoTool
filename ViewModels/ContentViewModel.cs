@@ -118,28 +118,50 @@ namespace YoLoTool.ViewModels
                 drawMat.DrawResizingLine(newSelectedRect, result);
                 if (_pressedInRect && pressed)
                 {
+                    var index = image.Rects.IndexOf(newSelectedRect);
+                    var newRect = newSelectedRect;
                     var x = _pressedInRectPoint.X;
                     var y = _pressedInRectPoint.Y;
                     var width = newSelectedRect.Width;
                     var height = newSelectedRect.Height;
                     var xDiff = x - point2d.X;
                     var yDiff = y - point2d.Y;
-                    var index = image.Rects.IndexOf(newSelectedRect);
-                    var newRect = newSelectedRect;
+                    if (result == EPointInRectResult.Right)
+                    {
+                        xDiff += newRect.Width;
+                    }
+                    if (result == EPointInRectResult.Bottom)
+                    {
+                        yDiff += newRect.Height;
+                    }
+                    var newX = (int)(x - xDiff);
+                    var newY = (int)(y - yDiff);
+                    var widthDiff = newX - newRect.X;
+                    var heightDiff = newY - newRect.Y;
+                    var newWidth = newRect.Width - widthDiff;
+                    var newHeight = newRect.Height - heightDiff;
+                    if (result == EPointInRectResult.Right)
+                    {
+                        newWidth += (int)(2 * widthDiff);
+                    }
+                    if (result == EPointInRectResult.Bottom)
+                    {
+                        newHeight += (int)(2 * heightDiff);
+                    }
                     switch (result)
                     {
                         case EPointInRectResult.Left:
-                            newRect = new Rect((int)(x - xDiff), newRect.Y, (int)(width ), (int)height);
+                            newRect = new Rect(newX, newRect.Y, newWidth, newRect.Height);
                             break;
-                        //case EPointInRectResult.Right:
-                        //    newRect = image.Rects[index] = new Rect((int)(x), (int)y, (int)(width - xDiff), (int)height);
-                        //    break;
-                        //case EPointInRectResult.Top:
-                        //    newRect = image.Rects[index] = new Rect((int)x, (int)(y - yDiff), (int)width, (int)(height - yDiff));
-                        //    break;
-                        //case EPointInRectResult.Bottom:
-                        //    newRect = image.Rects[index] = new Rect((int)x, (int)y, (int)width, (int)(height - yDiff));
-                        //    break;
+                        case EPointInRectResult.Right:
+                            newRect = new Rect(newRect.X, newRect.Y, newWidth, newRect.Height);
+                            break;
+                        case EPointInRectResult.Top:
+                            newRect = new Rect(newRect.X, newY, newRect.Width, newHeight);
+                            break;
+                        case EPointInRectResult.Bottom:
+                            newRect = new Rect(newRect.X, newRect.Y, newRect.Width, newHeight);
+                            break;
                     }
                     image.Rects[index] = newRect;
                     image.SelectedRect = newRect;

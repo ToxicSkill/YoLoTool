@@ -53,19 +53,19 @@ namespace YoLoTool.AI
 
         public static EPointInRectResult IsPointInRectBorderWithTolerance(Rect rect, Point2d point, int tolerance = 5)
         {
-            if (Math.Abs(rect.X - (int)point.X) <= tolerance)
+            if (Math.Abs(rect.X - (int)point.X) <= tolerance && rect.Y < point.Y && rect.BottomRight.Y > point.Y)
             {
                 return EPointInRectResult.Left;
             }
-            if (Math.Abs(rect.X + rect.Width - (int)point.X) <= tolerance)
+            if (Math.Abs(rect.BottomRight.X - (int)point.X) <= tolerance && rect.Y < point.Y && rect.BottomRight.Y > point.Y)
             {
                 return EPointInRectResult.Right;
             }
-            if (Math.Abs(rect.Y - (int)point.Y) <= tolerance)
+            if (Math.Abs(rect.Y - (int)point.Y) <= tolerance && rect.X < point.X && rect.BottomRight.X > point.X)
             {
                 return EPointInRectResult.Top;
             }
-            if (Math.Abs(rect.Y + rect.Height - (int)point.Y) <= tolerance)
+            if (Math.Abs(rect.BottomRight.Y - (int)point.Y) <= tolerance && rect.X < point.X && rect.BottomRight.X > point.X)
             {
                 return EPointInRectResult.Bottom;
             }

@@ -19,7 +19,7 @@ namespace YoLoTool.AI.Models
 
         public List<Point> Points { get; set; }
 
-        public Rect LastSelectedRect { get; set; }
+        public int SelectedRectIndex { get; set; }
 
         public Rect SelectedRect 
         {
@@ -34,10 +34,6 @@ namespace YoLoTool.AI.Models
                 else
                 {
                     SelectedObject = "";
-                }
-                if (_selecedRect != default)
-                {
-                    LastSelectedRect = value;
                 }
             }
         }

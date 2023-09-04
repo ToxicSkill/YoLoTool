@@ -64,6 +64,7 @@ namespace YoLoTool.Views
 
         private void image_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            ViewModel.SetPressEvent(false);
             if (!_isResizing)
             {
                 ViewModel.AddPoints(new Point2d(ViewModel.XPosition, ViewModel.YPosition));
@@ -72,8 +73,8 @@ namespace YoLoTool.Views
 
         private void image_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            ViewModel.SetPressEvent(true);
             image_MouseMove(sender, e);
-            ViewModel.SetPressEvent();
         }
 
         private void ListView_ManipulationBoundaryFeedback(object sender, ManipulationBoundaryFeedbackEventArgs e)

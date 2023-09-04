@@ -11,7 +11,7 @@ namespace YoLoTool.Converters
         {
             if (value is System.Drawing.Color color)
             {
-                return new SolidColorBrush(System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B));
+                return new SolidColorBrush(Color.FromArgb(color.A, color.R, color.G, color.B));
 
             }
             return new SolidColorBrush();

@@ -4,6 +4,7 @@ using OpenCvSharp;
 using OpenCvSharp.WpfExtensions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -21,6 +22,8 @@ namespace YoLoTool.ViewModels
         private const int ToleranceRectResize = 5;
 
         private bool _pressedInRect;
+
+        private bool _lock;
 
         private Point2d _pressedInRectPoint;
 
@@ -51,30 +54,44 @@ namespace YoLoTool.ViewModels
             } 
         }
 
-        public void SetPressEvent()
+        public void SetPressEvent(bool isPressed)
         {
-            _pressedInRect = false;
-            foreach (var rect in SelectedImage.Rects)
+            if (!isPressed)
             {
-                var innerResult = Utils.IsPointInRectBorderWithTolerance(rect, new Point2d(XPosition, YPosition), ToleranceRectResize);
-                if (innerResult != Enums.EPointInRectResult.False)
+                SelectedImage.SelectedRectIndex = -1;
+                Trace.WriteLine("Released");
+                _lock = false;
+                return;
+            }
+            if (!_lock)
+            {
+                _pressedInRect = false; 
+                foreach (var rect in SelectedImage.Rects)
                 {
-                    _pressedInRect = true;
-                    _pressedInRectPoint = new Point2d(XPosition, YPosition);
+                    var innerResult = Utils.IsPointInRectBorderWithTolerance(rect, new Point2d(XPosition, YPosition), ToleranceRectResize);
+                    if (innerResult != EPointInRectResult.False)
+                    {
+                        SelectedImage.SelectedRectIndex = SelectedImage.Rects.IndexOf(rect);
+                        Trace.WriteLine("Rect changed");
+                        _pressedInRect = true;
+                        _pressedInRectPoint = new Point2d(XPosition, YPosition);
+                    }
                 }
+                _lock = true;
+                Trace.WriteLine("Locked");
             }
         }
 
         public void DrawImage(Point2d point2d, bool pressed = false)
         {
-            Draw(point2d, SelectedImage, pressed);
+            DrawAll(point2d, SelectedImage, pressed);
         }
 
-        public void Draw(Point2d point2d, ImageAttributes image, bool pressed = false)
+        public void DrawAll(Point2d point2d, ImageAttributes image, bool pressed = false)
         {
             using var drawMat = image.Mat.Clone();
             var rectsInBoundPoint = new List<Rect>(); 
-            var rectsInRoi = new List<Rect>();
+            var rectsInRoi = new List<Rect>(); 
             Cursor = Cursors.Cross;
             foreach (var rect in image.Rects)
             {
@@ -84,16 +101,31 @@ namespace YoLoTool.ViewModels
                 {
                     rectsInRoi.Add(rect);
                 }
-                if (innerResult != Enums.EPointInRectResult.False)
+                if (innerResult != EPointInRectResult.False)
                 {
                     rectsInBoundPoint.Add(rect);
                 }
-            } 
-            if (rectsInRoi.Any())
+            }
+            var commonRects = rectsInRoi.Intersect(rectsInBoundPoint).ToList();
+            if (commonRects.Any())
             {
-                var newSelectedRect = rectsInRoi.MinBy(x => (x.Width * x.Height));
+                var newSelectedRect = commonRects.MinBy(x => (x.Width * x.Height));
                 drawMat.DrawSelectedRect(newSelectedRect);
                 image.SelectedRect = newSelectedRect;
+                var rectToDrawLine = newSelectedRect;
+                var result = Utils.IsPointInRectBorderWithTolerance(rectToDrawLine, point2d, ToleranceRectResize);
+                drawMat.DrawResizingLine(rectToDrawLine, result);
+                switch (result)
+                {
+                    case EPointInRectResult.Left:
+                    case EPointInRectResult.Right:
+                        Cursor = Cursors.SizeWE;
+                        break;
+                    case EPointInRectResult.Top:
+                    case EPointInRectResult.Bottom:
+                        Cursor = Cursors.SizeNS;
+                        break;
+                }
             }
             else
             {
@@ -101,21 +133,29 @@ namespace YoLoTool.ViewModels
             }
             if (rectsInBoundPoint.Any())
             {
-                var newSelectedRect = rectsInBoundPoint.MinBy(x => (x.Width * x.Height));
-                var result = Utils.IsPointInRectBorderWithTolerance(newSelectedRect, point2d, ToleranceRectResize);
-                drawMat.DrawResizingLine(newSelectedRect, result);
+                var rectToDrawLine = rectsInBoundPoint.MinBy(x => (x.Width * x.Height));
+                var result = Utils.IsPointInRectBorderWithTolerance(rectToDrawLine, point2d, ToleranceRectResize);
+                drawMat.DrawResizingLine(rectToDrawLine, result);
                 switch (result)
                 {
-                    case Enums.EPointInRectResult.Left:
-                    case Enums.EPointInRectResult.Right:
+                    case EPointInRectResult.Left:
+                    case EPointInRectResult.Right:
                         Cursor = Cursors.SizeWE;
                         break;
-                    case Enums.EPointInRectResult.Top:
-                    case Enums.EPointInRectResult.Bottom:
+                    case EPointInRectResult.Top:
+                    case EPointInRectResult.Bottom:
                         Cursor = Cursors.SizeNS;
                         break;
-                } 
-                drawMat.DrawResizingLine(newSelectedRect, result);
+                }
+                var newSelectedRect = new Rect();
+                if (SelectedImage.SelectedRectIndex != -1)
+                {
+                    newSelectedRect = SelectedImage.Rects[SelectedImage.SelectedRectIndex];
+                }
+                else
+                {
+                    newSelectedRect = rectToDrawLine;
+                }
                 if (_pressedInRect && pressed)
                 {
                     var index = image.Rects.IndexOf(newSelectedRect);
@@ -164,7 +204,6 @@ namespace YoLoTool.ViewModels
                             break;
                     }
                     image.Rects[index] = newRect;
-                    image.SelectedRect = newRect;
                 }
             }
 
@@ -177,17 +216,18 @@ namespace YoLoTool.ViewModels
             image.Image = drawMat.ToWriteableBitmap();
         }
 
+
         public void AddPoints(Point2d point2d)
         {
             SelectedImage.Points.Add(new Point(point2d.X, point2d.Y));
             if (SelectedImage.Points.Count % 2 == 0)
             {
                 var points = SelectedImage.Points.TakeLast(2).ToList();
-                var rect = new Rect(
-                        points[0].X,
-                        points[0].Y,
-                        Math.Abs(points[1].X - points[0].X),
-                        Math.Abs(points[1].Y - points[0].Y));
+                float top = Math.Min(points[0].Y, points[1].Y);
+                float bottom = Math.Max(points[0].Y, points[1].Y);
+                float left = Math.Min(points[0].X, points[1].X);
+                float right = Math.Max(points[0].X, points[1].X);
+                var rect = new Rect((int)left, (int)top, (int)(right - left), (int)(bottom - top));
                 if (SelectedLabel != null)
                 {
                     SelectedImage.ObjectByRect.Add(rect, SelectedLabel.Name);
@@ -256,7 +296,7 @@ namespace YoLoTool.ViewModels
             }
             foreach (var image in ImagesAttributeContainer.Images)
             {
-                Draw(new Point2d(), image);
+                DrawAll(new Point2d(), image);
             }
         }
 

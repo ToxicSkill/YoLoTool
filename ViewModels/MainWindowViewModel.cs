@@ -43,6 +43,14 @@ namespace YoLoTool.ViewModels
                 Content = "Labeling",
                 PageType = typeof(ContentView)
             });
+            MenuItems.Add(new NavigationItem()
+            {
+                Icon = SymbolRegular.ArrowExportUp20,
+                PageTag = "export",
+                Cache = true,
+                Content = "Export",
+                PageType = typeof(ExportView)
+            });
             FooterItems.Add(new NavigationSeparator());
             FooterItems.Add(new NavigationItem()
             {

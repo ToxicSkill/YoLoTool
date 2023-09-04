@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Windows.Documents;
 using System.Windows.Input;
 using Wpf.Ui.Common.Interfaces;
 using YoLoTool.AI;

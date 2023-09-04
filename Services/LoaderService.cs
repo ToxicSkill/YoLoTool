@@ -31,5 +31,17 @@ namespace YoLoTool.Services
             }
             return "";
         }
+
+        public string GetSingleSaveFilePath()
+        {
+            var dialog = new SaveFileDialog();
+            dialog.DefaultExt = ".txt";
+            var result = dialog.ShowDialog();
+            if (result == true)
+            {
+                return dialog.FileName;
+            }    
+            return "";
+        }
     }
 }

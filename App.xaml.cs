@@ -37,6 +37,9 @@ namespace YoLoTool
             services.AddScoped<HomeView>();
             services.AddScoped<HomeViewModel>();
 
+            services.AddScoped<ExportView>();
+            services.AddScoped<ExportViewModel>();
+
             services.AddScoped<INavigationWindow, MainWindow>();
             services.AddScoped<MainWindowViewModel>();
         }).Build();

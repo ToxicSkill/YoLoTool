@@ -10,6 +10,11 @@ namespace YoLoTool.Views
     /// </summary>
     public partial class ContentView : INavigableView<ContentViewModel>
     {
+
+        private bool _innerIsResizing = false;
+
+        private bool _isResizing = false;
+
         public ContentViewModel ViewModel
         {
             get;
@@ -43,13 +48,32 @@ namespace YoLoTool.Views
             var coords = GetImageCoordsAt(e);
             ViewModel.XPosition = coords.X;
             ViewModel.YPosition = coords.Y;
-            ViewModel.DrawImage(coords);
+            if (_innerIsResizing)
+            {
+                _isResizing = true;
+                _innerIsResizing = false;
+            }
+            _innerIsResizing = e.LeftButton == MouseButtonState.Pressed;
+            if (!_innerIsResizing)
+            {
+                _isResizing = false;
+            }
+            ViewModel.DrawImage(coords, _isResizing);
             image.Focus();
         }
 
         private void image_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            ViewModel.AddPoints(new Point2d(ViewModel.XPosition, ViewModel.YPosition));
+            if (!_isResizing)
+            {
+                ViewModel.AddPoints(new Point2d(ViewModel.XPosition, ViewModel.YPosition));
+            }
+        }
+
+        private void image_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            image_MouseMove(sender, e);
+            ViewModel.SetPressEvent();
         }
 
         private void ListView_ManipulationBoundaryFeedback(object sender, ManipulationBoundaryFeedbackEventArgs e)

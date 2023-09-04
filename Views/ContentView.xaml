@@ -26,13 +26,14 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="60"/>
             </Grid.RowDefinitions>
-            <Image x:Name="image" Cursor="Cross"
+            <Image x:Name="image" Cursor="{Binding Cursor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                    Focusable="True" 
                    PreviewKeyDown="image_PreviewKeyDown"
-               Source="{Binding SelectedImage.Image, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-               MouseMove="image_MouseMove"
-               PreviewMouseLeftButtonUp="image_PreviewMouseLeftButtonUp"
-               MouseLeave="image_MouseLeave"/>
+                   Source="{Binding SelectedImage.Image, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                   MouseMove="image_MouseMove"
+                   PreviewMouseLeftButtonUp="image_PreviewMouseLeftButtonUp"
+                   PreviewMouseLeftButtonDown="image_PreviewMouseLeftButtonDown"
+                   MouseLeave="image_MouseLeave"/>
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>

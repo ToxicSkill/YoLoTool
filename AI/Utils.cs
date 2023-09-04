@@ -1,7 +1,9 @@
 ﻿using Microsoft.ML.OnnxRuntime.Tensors;
+using OpenCvSharp;
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using YoLoTool.Enums;
 
 namespace YoLoTool.AI
 {
@@ -47,6 +49,27 @@ namespace YoLoTool.AI
                 didx++;
                 sidx += 3;
             }
+        }
+
+        public static EPointInRectResult IsPointInRectBorderWithTolerance(Rect rect, Point2d point, int tolerance = 5)
+        {
+            if (Math.Abs(rect.X - (int)point.X) <= tolerance)
+            {
+                return EPointInRectResult.Left;
+            }
+            if (Math.Abs(rect.X + rect.Width - (int)point.X) <= tolerance)
+            {
+                return EPointInRectResult.Right;
+            }
+            if (Math.Abs(rect.Y - (int)point.Y) <= tolerance)
+            {
+                return EPointInRectResult.Top;
+            }
+            if (Math.Abs(rect.Y + rect.Height - (int)point.Y) <= tolerance)
+            {
+                return EPointInRectResult.Bottom;
+            }
+            return EPointInRectResult.False;
         }
     }
 }
